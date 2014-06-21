@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+      <div class="jumbotron">
+        <h1>СМС Банк</h1>
+        <p class="lead">Добро пожаловать в интерфейс управления <strong>GOIP</strong> устройствами.</p>
+        <p>
+          <a class="btn btn-success" href="{% url 'login' %}" role="button">Войти</a>
+          <a class="btn btn-primary" href="{% url 'register' %}" role="button">Регистрация</a>
+        </p>
+        <p>Если вы администратор, то вам <a href="{% url 'admin:index' %}">сюда</a></p>
+      </div>
+
+{% endblock %}
+

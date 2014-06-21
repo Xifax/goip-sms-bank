@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+ <div class="row">
+      <div class="span4 offset4 well">
+          <legend>Вход в систему</legend>
+
+          <form role="form" method="POST" action="{% url 'login' %}">
+          {% csrf_token %}
+
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+              </div>
+            {% endif %}
+
+            <div class="form-group {% if form.username.errors %}has-error{% endif %}">
+              <label class="control-label " for="id_username">
+                Логин {{ form.username.errors }}
+              </label>
+              {{ form.username }}
+            </div>
+            <div class="form-group {% if form.password.errors %}has-error{% endif %}">
+              <label class="control-label" for="id_password">
+                Пароль {{ form.password.errors }}
+              </label>
+              {{ form.password }}
+            </div>
+
+            <button type="submit" name="submit" class="btn btn-success">Войти</button>
+          </form>
+      </div>
+  </div>
+
+{% endblock %}

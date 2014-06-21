@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- Sub-navigation -->
+<ul class="nav nav-tabs nav-justified">
+  <li><a href="{% url 'grunt-list' grunt %}">Список СМС</a></li>
+  <li class="active"><a href="{% url 'grunt-send' grunt %}">Отправить СМС</a></li>
+</ul>
+
+<!-- Additional info -->
+<div class="bs-callout bs-callout-info">
+    <h4>Отправка сообщения</h4>
+    <p>NB: сообщение может быть отправлено с некоторой задержкой</p>
+</div>
+
+{% if sms_sent %}
+<div class="alert alert-success">Сообщение отправлено!</div>
+{% endif %}
+
+{% if error_message %}
+<p class="alert alert-danger"><strong>{{ error_message }}</strong></p>
+{% endif %}
+
+
+<form role="form" action="{% url 'grunt-send' grunt %}" class="well"
+  method="post">
+  {% csrf_token %}
+  {{ form.non_field_errors}}
+  <div class="form-group {% if form.phone.errors %}has-error{% endif %}">
+    <label class="control-label" for="id_phone">
+      Телефон {{ form.phone.errors }}
+    </label>
+    {{ form.phone }}
+  </div>
+  <div class="form-group {% if form.message.errors %}has-error{% endif %}">
+    <label class="control-label" for="id_message">
+      Сообщение {{ form.message.errors }}
+    </label>
+    {{ form.message }}
+  </div>
+  <input class="btn {% if not form.phone.errors and not form.message.errors %}
+    btn-success {% else %} btn-default {% endif %}"
+    type="submit" value="Отправить" />
+</form>
+
+{% endblock %}

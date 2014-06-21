@@ -1,0 +1,8 @@
+# This file contains common Python dependencies for all circumstances.
+Django==1.6.5
+gunicorn==18.0
+django-suit==0.2.8
+wsgiref==0.1.2
+python-nmap==0.1.1
+MySQL-python==1.2.5
+requests==2.3.0

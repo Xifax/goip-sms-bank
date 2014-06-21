@@ -1,4 +1,11 @@
 # Core tasks
+run:
+	python manage.py runserver
+
+gunicorn:
+	gunicorn smsbank.wsgi
+
+# Setup tasks
 init:
 	pip install -r requirements/dev.txt
 	cd etc && npm install && bower install && grunt build
@@ -11,9 +18,6 @@ static:
 update:
 	pip install -r requirements/dev.txt
 	cd etc && bower update
-
-run:
-	python manage.py runserver
 
 # Utlity tasks
 purge:

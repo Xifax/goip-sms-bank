@@ -1,0 +1,26 @@
+      <div class="header">
+        <ul class="nav nav-pills pull-right">
+
+          {% url 'grunts' as url %}
+          <li {% if request.path == url or 'grunt' in request.path %} class="active" {% endif %}%>
+            <a href="{{ url }}">Устройства</a>
+          </li>
+
+          {% url 'info' as url %}
+          <li {% if request.path == url %} class="active" {% endif %}%>
+            <a href="{{ url }}">Информация</a>
+          </li>
+
+          {% if user.is_authenticated %}
+            <li>
+              <a href="{% url 'logout'%}">Выйти</a>
+            </li>
+          {% endif %}
+
+        </ul>
+        <h3 class="text-muted">СМС Банк
+          {% if user.is_authenticated %}
+            ({{ user.username }})
+          {% endif %}
+        </h3>
+      </div>

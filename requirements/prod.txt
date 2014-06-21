@@ -1,0 +1,2 @@
+# This file contains Python dependencies for the production server.
+-r common.txt

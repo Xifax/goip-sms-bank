@@ -1,0 +1,2 @@
+# This file contains Python dependencies for the staging server.
+-r common.txt

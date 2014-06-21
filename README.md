@@ -53,6 +53,10 @@ result of running `./manage.py collectstatic`, which collects files from
 `etc/dist` and other static assets in one folder.  These folders are by
 default excluded from git repository.
 
+## Development
+
+TO DO.
+
 ## Deployment
 
 TO DO.
