@@ -53,13 +53,13 @@ This project uses `Makefile` for some generic tasks. E.g., you may initialize
 development environment and run production/development tasks using `make`
 command. The following tasks are available:
 
-- run (default task): run Django development server with default params;
-- gunicorn: run wsgi gunicorn server;
-- init: initialize repository by install requirements, node modules
+- **run** (default task): run Django development server with default params;
+- **gunicorn**: run wsgi gunicorn server;
+- **init**: initialize repository by install requirements, node modules
     and building frontend static files;
-- static: compile and collect static files;
-- update: update project and bower modules;
-- purge: remove all project artifacts, such as virtualenvironment, node
+- **static**: compile and collect static files;
+- **update**: update project and bower modules;
+- **purge**: remove all project artifacts, such as virtualenvironment, node
     modules and so on.
 
 ## Development
