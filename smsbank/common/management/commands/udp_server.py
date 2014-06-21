@@ -1,10 +1,12 @@
 # encoding: utf-8
 from django.core.management.base import BaseCommand
+from twisted.internet import reactor
 
 from smsbank.apps.hive.utils import (
     HandleUdp,
     ThreadedHandleUdp,
-    MultiServer
+    MultiServer,
+    Echo
 )
 
 from optparse import make_option
@@ -32,6 +34,12 @@ class Command(BaseCommand):
             dest='multithread',
             default=False,
             help='Use multithreading'),
+        make_option(
+            '--twisted',
+            action='store_true',
+            dest='twisted',
+            default=False,
+            help='Use twisted server'),
     )
 
     help = """
@@ -43,7 +51,11 @@ class Command(BaseCommand):
         """
         Launch UDP server
         """
-        if options['multithread']:
+        if options['twisted']:
+            reactor.listenUDP(options['port'], Echo())
+            reactor.run()
+
+        elif options['multithread']:
             server = MultiServer(
                 (options['host'], options['port']),
                 ThreadedHandleUdp

@@ -2,6 +2,12 @@
 import SocketServer
 import threading
 
+from twisted.internet import protocol
+
+################
+# SocketServer #
+################
+
 
 class HandleUdp(SocketServer.BaseRequestHandler):
     """
@@ -38,6 +44,20 @@ class ThreadedHandleUdp(SocketServer.BaseRequestHandler):
         # Reply with uppercased data
         socket.sendto(data.upper(), self.client_address)
 
+    def finish(self):
+        pass
+
 
 class MultiServer(SocketServer.ThreadingMixIn, SocketServer.UDPServer):
-    pass
+    daemon_threads = True
+
+
+###########
+# Twisted #
+###########
+
+class Echo(protocol.DatagramProtocol):
+
+    def datagramReceived(self, data, (host, port)):
+        print "received %r from %s:%d" % (data, host, port)
+        self.transport.write(data, (host, port))
