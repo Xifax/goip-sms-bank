@@ -1,7 +1,12 @@
 {
   "name": "etc",
-  "version": "0.0.0",
-  "dependencies": {},
+  "version": "0.1.0",
+  "description": "Client frontend for goip-sms-bank.",
+  "private": true,
+  "dependencies": {
+      "bower": "^1.3.5",
+      "grunt-cli": "^0.1.13"
+  },
   "devDependencies": {
     "coffee-script": "^1.7.1",
     "grunt": "^0.4.5",

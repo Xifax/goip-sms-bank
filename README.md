@@ -60,7 +60,7 @@ First, initialize and source `python2` virtualenv:
     virtualenv venv
     souce venv/bin/activate
 
-Then, (you should have `npm` in your path) run:
+Then, (you should have `npm`, `ruby` and `compass` in your path) run:
 
     make init
 

@@ -8,16 +8,16 @@ gunicorn:
 # Setup tasks
 init:
 	pip install -r requirements/dev.txt
-	cd etc && npm install && bower install && grunt build
+	cd etc && npm install && node_modules/.bin/bower install && node_modules/.bin/grunt build
 	python manage.py collectstatic --noinput
 
 static:
-	cd etc && grunt build
+	cd etc && node_modules/.bin/grunt build
 	python manage.py collectstatic --noinput
 
 update:
 	pip install -r requirements/dev.txt
-	cd etc && bower update
+	cd etc && node_modules/.bin/bower update
 
 # Utlity tasks
 purge:
