@@ -2,7 +2,7 @@
 import SocketServer
 import threading
 
-from twisted.internet import protocol
+#from twisted.internet import protocol
 
 ################
 # SocketServer #
@@ -55,9 +55,10 @@ class MultiServer(SocketServer.ThreadingMixIn, SocketServer.UDPServer):
 ###########
 # Twisted #
 ###########
-
+'''
 class Echo(protocol.DatagramProtocol):
 
     def datagramReceived(self, data, (host, port)):
         print "received %r from %s:%d" % (data, host, port)
         self.transport.write(data, (host, port))
+'''
