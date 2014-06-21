@@ -55,7 +55,17 @@ default excluded from git repository.
 
 ## Development
 
-TO DO.
+First, initialize and source `python2` virtualenv:
+
+    virtualenv venv
+    souce venv/bin/activate
+
+Then, (you should have `npm` in your path) run:
+
+    make init
+
+This task should install pip requirements, then install nodejs modules,
+download bower components, run grunt build and collect resulting static files.
 
 ## Deployment
 

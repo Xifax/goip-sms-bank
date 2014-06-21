@@ -9,11 +9,11 @@ gunicorn:
 init:
 	pip install -r requirements/dev.txt
 	cd etc && npm install && bower install && grunt build
-	cd - && python manage.py collectstatic
+	python manage.py collectstatic --noinput
 
 static:
 	cd etc && grunt build
-	cd - && python manage.py collectstatic
+	python manage.py collectstatic --noinput
 
 update:
 	pip install -r requirements/dev.txt
