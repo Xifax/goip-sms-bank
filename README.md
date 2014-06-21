@@ -38,6 +38,15 @@ command.
 Should contain secret keys, local settings and so on.
 These files are for soft-linking in `smsbank/spec`.
 
+    etc/static
+    etc/static_collected
+
+Both of those folders are created using build procedures.
+`etc/static` is produced when running `Grunt`, `etc/static_collected` is a
+result of running `./manage.py collectstatic`, which collects files from
+`etc/static` and other static assets in one folder.  These folders are by
+default excluded from git repository.
+
 ## Deployment
 
 TO DO.
