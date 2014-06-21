@@ -4,12 +4,6 @@ Web application for managing multiple GOIP devices via UDP requests and
 separate daemon-listener. Additional details to follow.
 Based on [android-sms-hivemind](https://github.com/Xifax/android-sms-bank).
 
-## Makefile to rule them all
-
-This project uses `Makefile` for some generic tasks. E.g., you may initialize
-development environment and run production/development tasks using `make`
-command.
-
 ## About directory structure
 
         smsbank
@@ -53,6 +47,21 @@ result of running `./manage.py collectstatic`, which collects files from
 `etc/dist` and other static assets in one folder.  These folders are by
 default excluded from git repository.
 
+## Makefile to rule them all
+
+This project uses `Makefile` for some generic tasks. E.g., you may initialize
+development environment and run production/development tasks using `make`
+command. The following tasks are available:
+
+    - run (default task): run Django development server with default params;
+    - gunicorn: run wsgi gunicorn server;
+    - init: initialize repository by install requirements, node modules
+      and building frontend static files;
+    - static: compile and collect static files;
+    - update: update project and bower modules;
+    - purge: remove all project artifacts, such as virtualenvironment, node
+      modules and so on.
+
 ## Development
 
 First, initialize and source `python2` virtualenv:
@@ -60,7 +69,7 @@ First, initialize and source `python2` virtualenv:
     virtualenv venv
     souce venv/bin/activate
 
-Then, (you should have `npm`, `ruby` and `compass` in your path) run:
+Then (you should have `npm`, `ruby` and `compass` in your path) run:
 
     make init
 

@@ -8,7 +8,8 @@ gunicorn:
 # Setup tasks
 init:
 	pip install -r requirements/dev.txt
-	cd etc && npm install && node_modules/.bin/bower install && node_modules/.bin/grunt build
+	cd etc && npm install && node_modules/.bin/bower install && \
+   		node_modules/.bin/grunt build
 	python manage.py collectstatic --noinput
 
 static:
@@ -19,7 +20,7 @@ update:
 	pip install -r requirements/dev.txt
 	cd etc && node_modules/.bin/bower update
 
-# Utlity tasks
+# Utility tasks
 purge:
 	rm -rf venv/
 	rm -rf etc/node_modules/
