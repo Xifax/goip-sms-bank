@@ -158,8 +158,8 @@ module.exports = function (grunt) {
         ignorePath: new RegExp('^<%= yeoman.app %>/|../')
       },
       sass: {
-      src: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
-      ignorePath: /(\.\.\/){1,2}bower_components\//
+        src: ['<%= yeoman.app %>/styles/{,*/}*.{scss,sass}'],
+        ignorePath: /(\.\.\/){1,2}bower_components\//
       }
     },
 

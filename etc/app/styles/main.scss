@@ -6,13 +6,19 @@ $icon-font-path: "../bower_components/bootstrap-sass-official/vendor/assets/font
 
 /* Use custom bootswatch themes */
 
-// @import "bootstrap-sass-official/vendor/assets/stylesheets/bootstrap/variables";
-// @import "bootswatch-scss/simplex/variables";
-// @import "bootstrap-sass-official/vendor/assets/stylesheets/bootstrap/bootstrap";
-// @import "bootswatch-scss/simplex/bootswatch";
+@import "bootstrap-sass-official/vendor/assets/stylesheets/bootstrap/variables";
+@import "bootswatch-scss/flatly/variables";
 
+// Bootswatch breaks font path, let's fix it
+$icon-font-path: "../bower_components/bootstrap-sass-official/vendor/assets/fonts/bootstrap/";
+
+@import "bootstrap-sass-official/vendor/assets/stylesheets/bootstrap/bootstrap";
+@import "bootswatch-scss/flatly/bootswatch";
+
+/* END of custom themes */
 
 // Import additional styles
+@import "fonts";
 @import "elements";
 
 .browsehappy {

@@ -103,7 +103,7 @@ def grunts(request):
     """Display device list"""
 
     if not request.user.is_authenticated():
-        return redirect('index')
+        return redirect('login')
 
     # Get device list available for this user
     try:

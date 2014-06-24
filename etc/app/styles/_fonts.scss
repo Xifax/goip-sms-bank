@@ -1,0 +1,26 @@
+/* Import Google fonts */
+
+// @import url(http://fonts.googleapis.com/css?family=Roboto:300,400&subset=latin,cyrillic);
+@import url(http://fonts.googleapis.com/css?family=Roboto:300,400|Anonymous+Pro&subset=latin,cyrillic);
+
+/* Fonts settings */
+
+$sansFont: 'Roboto', 'Segoe UI', 'Frutiger', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif !default;
+$serifFont: 'Cambria', 'Georgia', 'Times', 'Times New Roman', serif !default;
+$monoFont: 'Anonymous Pro', Monaco, Menlo, Consolas, 'Courier New', monospace !default;
+$thinFont: 'Roboto', sans-serif !default;
+
+body {
+  font-smooth: always;
+  -webkit-font-smoothing: subpixel-antialiased;
+  -webkit-font-smoothing: antialiased;
+}
+
+.thin-font {
+  font-family: $thinFont;
+  font-weight: 300;
+}
+
+.mono-font {
+  font-family: $monoFont;
+}
