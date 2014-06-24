@@ -1,6 +1,6 @@
 # encoding: utf-8
 from django.core.management.base import BaseCommand
-from twisted.internet import reactor
+#from twisted.internet import reactor
 
 from smsbank.apps.hive.utils import (
     HandleUdp,
@@ -51,9 +51,9 @@ class Command(BaseCommand):
         """
         Launch UDP server
         """
-        if options['twisted']:
-            reactor.listenUDP(options['port'], Echo())
-            reactor.run()
+ #       if options['twisted']:
+ #           reactor.listenUDP(options['port'], Echo())
+  #          reactor.run()
 
         elif options['multithread']:
             server = MultiServer(
