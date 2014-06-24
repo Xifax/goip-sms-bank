@@ -17,6 +17,9 @@ from models import DeviceList, Device
 
 def index(request):
     """Display landing page"""
+    if request.user.is_authenticated():
+        return redirect('grunts')
+
     return render(request, 'home.html')
 
 
@@ -166,6 +169,17 @@ def logout(request):
         logout_user(request)
         return redirect('index')
 
+
+##############
+# Additional #
+##############
+
+def profile(request):
+    """Display configuration associated with user account"""
+    if not request.user.is_authenticated():
+        return redirect('login')
+
+    return render(request, 'profile/main.html')
 
 ##############
 # Additional #

@@ -19,6 +19,9 @@ urlpatterns = patterns(
         views.grunt_send, name='grunt-send'
         ),
 
+    # Profile
+    url(r'^profile/', views.profile, name='profile'),
+
     # Additional
     url(r'^info/', views.info, name='info'),
 

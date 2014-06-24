@@ -6,10 +6,19 @@
             <a href="{{ url }}">Устройства</a>
           </li>
 
+          {% if not user.is_authenticated %}
           {% url 'info' as url %}
           <li {% if request.path == url %} class="active" {% endif %}%>
             <a href="{{ url }}">Информация</a>
           </li>
+          {% endif %}
+
+          {% if user.is_authenticated %}
+          {% url 'profile' as url %}
+            <li {% if request.path == url %} class="active" {% endif %}%>
+              <a href="{{ url }}">Настройки</a>
+            </li>
+          {% endif %}
 
           {% if user.is_authenticated %}
             <li>
