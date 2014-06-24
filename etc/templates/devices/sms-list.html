@@ -1,5 +1,9 @@
 <!-- Additional info -->
 <div class="bs-callout bs-callout-info">
+  <!--a href="{% url 'grunts'%}" role="button" style="padding:15px; margin-right: 10px;"
+    class="pull-left btn btn-success">
+    Назад
+  </a-->
     <h4>Информация о всех смс отправленных с данного устройства</h4>
     <p>NB: иногда вместо номера может отображаться зарегистрированное имя</p>
 </div>
@@ -10,6 +14,9 @@
   <!-- Table header and additional info -->
   <div class="panel-heading">
     СМС отправленные с устройства <strong>{{ grunt.ip }}:{{ grunt.port}}</strong>
+    <!--a href="{% url 'grunts' %}" class="btn btn-xs btn-success pull-right" role="button">
+      К списку устройств
+    </a-->
   </div>
   <div class="panel-body">
     <p>Всего СМС: <strong>{{sms_sent|length}}</strong></p>
