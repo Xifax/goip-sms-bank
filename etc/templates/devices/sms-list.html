@@ -13,7 +13,9 @@
   </div>
   <div class="panel-body">
     <p>Всего СМС: <strong>{{sms_sent|length}}</strong></p>
+    {% if sms_sent|length > 0 %}
     <p>Последняя СМС: <strong>{{sms_sent.0.date}}</strong></p>
+    {% endif %}
   </div>
 
   <!-- SMS list -->
@@ -21,7 +23,7 @@
     <thead>
           <tr>
             <th>#</th>
-            <th>Телефон</th>
+            <th>Адресат</th>
             <th>Сообщение</th>
             <th>Дата</th>
           </tr>
@@ -34,6 +36,14 @@
       <td>{{ sms.date }} </td>
     </tr>
     {% endfor %}
+
+    {% if not sms_sent %}
+    <tr>
+      <td colspan="4">
+        Нет отправленных СМС!
+      </td>
+    </tr>
+    {% endif %}
 
   </table>
 

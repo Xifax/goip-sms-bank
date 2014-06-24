@@ -1,6 +1,7 @@
 # coding: utf-8
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
+from django.http import Http404
 from django.contrib.auth import(
     login as login_user,
     logout as logout_user,
@@ -131,12 +132,11 @@ def grunt_list(request, grunt):
     if not request.user.is_authenticated():
         return redirect('index')
 
-    # TODO: show error if no device found
     device = get_device_by_id(grunt)
-    if device:
-        sms_sent = sms_list(device)
-    else:
-        sms_sent = []
+    if not device:
+        raise Http404
+
+    sms_sent = sms_list(device)
 
     return render(
         request,
