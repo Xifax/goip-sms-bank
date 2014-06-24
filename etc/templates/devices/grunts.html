@@ -7,22 +7,21 @@
   <div class="panel-heading">Доступные устройства</div>
   <div class="panel-body">
     <p>
-    Обнаружены в сети @<strong>192.168.1.0/24</strong>,
-    порт <strong>8080</strong>
+      Последнее обновление: <не указано>
     </p>
   </div>
 
   <ul class="list-group">
 
     {% for grunt in grunts %}
-    <a href="{% url 'grunt-list' grunt.ip %}" class="list-group-item"
+    <a href="{% url 'grunt-list' grunt.id %}" class="list-group-item"
       title="Отобразить список отправленных смс">
         {% if grunt.online %}
           <span class="badge alert-success">доступно</span>
         {% else %}
           <span class="badge alert-danger">недоступно</span>
         {% endif %}
-          {{ grunt.ip }}
+          {{ grunt.ip }}:<strong>{{ grunt.port }}</strong>
       </a>
     {% endfor %}
 

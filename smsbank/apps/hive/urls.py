@@ -11,11 +11,11 @@ urlpatterns = patterns(
     # Working with devices
     url(r'^grunts/', views.grunts, name='grunts'),
     url(
-        r'^grunt/list/(?P<grunt>[a-zA-Z0-9.]+)/',
+        r'^grunt/list/(?P<grunt>[0-9]+)/',
         views.grunt_list, name='grunt-list'
         ),
     url(
-        r'^grunt/send/(?P<grunt>[a-zA-Z0-9.]+)/',
+        r'^grunt/send/(?P<grunt>[0-9]+)/',
         views.grunt_send, name='grunt-send'
         ),
 

@@ -9,7 +9,7 @@
 
   <!-- Table header and additional info -->
   <div class="panel-heading">
-    СМС отправленные с устройства <strong>{{ grunt }}</strong>
+    СМС отправленные с устройства <strong>{{ grunt.ip }}:{{ grunt.port}}</strong>
   </div>
   <div class="panel-body">
     <p>Всего СМС: <strong>{{sms_sent|length}}</strong></p>
@@ -29,8 +29,8 @@
     {% for sms in sms_sent %}
     <tr>
       <td>{{ forloop.counter }}</td>
-      <td>{{ sms.number }} </td>
-      <td>{{ sms.body }} </td>
+      <td>{{ sms.recipient }} </td>
+      <td>{{ sms.message }} </td>
       <td>{{ sms.date }} </td>
     </tr>
     {% endfor %}
