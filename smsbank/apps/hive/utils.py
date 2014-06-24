@@ -18,6 +18,7 @@ class GoipUDPSender:
     '''
     '''
     
+    
 class GoipUDPListener(ss.BaseRequestHandler):
     """
     This class works similar to the TCP handler class, except that
