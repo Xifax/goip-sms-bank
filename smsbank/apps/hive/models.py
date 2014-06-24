@@ -25,7 +25,7 @@ class Sms(models.Model):
     """SMS, send or received by device"""
     recipient = models.CharField(max_length='100')
     message = models.CharField(max_length='10000')
-    date = models.DateField(null=True, blank=True)
+    date = models.DateField(auto_now_add=True, null=True, blank=True)
     device = models.ForeignKey(Device, null=True, blank=True)
 
     class Meta:
