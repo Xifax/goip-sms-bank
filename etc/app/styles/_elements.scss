@@ -29,3 +29,11 @@ border-color: #f1e7bc;
 background-color: #f0f7fd;
 border-color: #d0e3f0;
 }
+
+/* Logo */
+.logo {
+  @extend .text-muted;
+  &:hover {
+    text-decoration: none;
+  }
+}

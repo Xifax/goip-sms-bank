@@ -18,7 +18,10 @@
           {% endif %}
 
         </ul>
-        <h3 class="text-muted thin-font">СМС Банк
+        <h3 class="text-muted thin-font">
+          <a class='logo' href="{% url 'landing' %}">
+            СМС Банк
+          </a>
           {% if user.is_authenticated %}
             ({{ user.username }})
           {% endif %}
