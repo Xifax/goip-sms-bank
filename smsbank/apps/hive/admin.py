@@ -1,7 +1,8 @@
 from django.contrib import admin
 from models import (
     Device,
-    DeviceList
+    DeviceList,
+    Sms
 )
 
-admin.site.register([Device, DeviceList])
+admin.site.register([Device, DeviceList, Sms])

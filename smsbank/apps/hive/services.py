@@ -26,8 +26,11 @@ def get_or_create_device(ip, port, status=True):
     return device
 
 
-def new_sms(recipient, message):
+def new_sms(recipient, message, device=None):
     """Create new SMS."""
     sms = Sms(recipient=recipient, message=message)
+    if device:
+        sms.device = device
     sms.save()
+
     return sms
