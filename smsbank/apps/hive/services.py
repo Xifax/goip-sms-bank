@@ -34,3 +34,16 @@ def new_sms(recipient, message, device=None):
     sms.save()
 
     return sms
+
+
+def sms_list(device):
+    """Get SMS sent from the device"""
+    return Sms.objects.filter(device=device)
+
+
+def get_device_by_id(device_id):
+    """Get device by id"""
+    try:
+        return Device.objects.get(id=device_id)
+    except Device.DoesNotExist:
+        return None

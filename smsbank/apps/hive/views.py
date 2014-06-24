@@ -9,6 +9,7 @@ from django.contrib.auth import(
 
 from forms import SMSForm, CustomAuthForm, CustomRegisterForm
 from models import DeviceList, Device
+from services import sms_list, get_device_by_id
 
 ################
 # Landing page #
@@ -130,10 +131,17 @@ def grunt_list(request, grunt):
     if not request.user.is_authenticated():
         return redirect('index')
 
+    # TODO: show error if no device found
+    device = get_device_by_id(grunt)
+    if device:
+        sms_sent = sms_list(device)
+    else:
+        sms_sent = []
+
     return render(
         request,
         'devices/grunt.html',
-        {'grunt': grunt, 'sms_sent': []}
+        {'grunt': device, 'sms_sent': sms_sent}
     )
 
 
