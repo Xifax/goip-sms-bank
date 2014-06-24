@@ -1,5 +1,6 @@
 # This file contains common Python dependencies for all circumstances.
 Django==1.6.5
+South==0.8.4
 gunicorn==18.0
 django-suit==0.2.8
 wsgiref==0.1.2

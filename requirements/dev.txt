@@ -1,5 +1,6 @@
 # This file contains Python dependencies for development only.
 Django==1.6.5
+South==0.8.4
 gunicorn==18.0
 wsgiref==0.1.2
 python-nmap==0.1.1

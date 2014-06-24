@@ -9,8 +9,10 @@ gunicorn:
 init:
 	pip install -r requirements/dev.txt
 	cd etc && npm install && node_modules/.bin/bower install && \
-   		node_modules/.bin/grunt build
+		node_modules/.bin/grunt build
 	python manage.py collectstatic --noinput
+	python manage.py syncdb
+	python manage.py migrate hive
 
 static:
 	cd etc && node_modules/.bin/grunt build
@@ -19,6 +21,7 @@ static:
 update:
 	pip install -r requirements/dev.txt
 	cd etc && node_modules/.bin/bower update
+	python manage.py migrate hive
 
 # Utility tasks
 purge:
