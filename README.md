@@ -78,7 +78,69 @@ download bower components, run grunt build and collect resulting static files.
 
 ## Deployment
 
-TO DO.
+Application should be deployed in conjunction with nginx server and
+supervisor. Nginx is used as reverse-proxy for gunicorn and also as static
+assets server. Supervisor is used to monitor and restart (if necessary)
+gunicorn server itself.
+
+Suggested nginx config:
+```
+http {
+    # may also use gzip_static
+    gzip on;
+    gzip_http_version 1.0;
+    gzip_proxied any;
+
+    server {
+
+        listen 80;
+        server_name smsbank.net;
+
+        # serve static files
+        location /static/ {
+            alias /path/to/application/etc/static_collected/;
+            location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
+                expires 1y;
+                log_not_found off;
+            }
+        }
+
+        # reverse-proxy gunicorn server
+        location / {
+            proxy_pass_header Server;
+            proxy_set_header Host $http_host;
+            proxy_redirect off;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Scheme $scheme;
+            proxy_connect_timeout 10;
+            proxy_read_timeout 10;
+            proxy_pass http://127.0.0.1:8000/;
+        }
+
+    }
+}
+```
+
+Suggested supervisor config:
+```
+[program:smsbank]
+directory=/path/to/app
+command=/path/to/app/venv/bin/gunicorn smsbank.wsgi
+user=user
+umask=022
+autostart=True
+autorestart=True
+redirect_stderr=True
+
+[program:smsbank-daemon]
+directory=/path/to/app
+command=/path/to/app/venv/bin/python manage.py run_daemon
+user=user
+umask=022
+autostart=True
+autorestart=True
+redirect_stderr=True
+```
 
 ## Additional notes
 
