@@ -30,13 +30,11 @@ class LocalAPIServer(mp.Process):
         
     class LocalAPIListener(ss.BaseRequestHandler):
         def handle(self):
-            data = self.request[0].strip()
-            socket = self.request[1]
-            command = self.getCommand(self.request[0])
-            dummyReq = '{"id": 1, "command": "USSD", data: {"code": "*201#"}}'
-            #realCommand = json.JSONDecoder(self.request[0])
-            realCommand = json.JSONDecoder().decode(dummyReq)
-            realCommand = ""
+            realCommand = json.loads(self.request[0])
+            self.queue.push(realCommand)
+            print "we got signal"
+            print realCommand
+
             """
             id
             command
@@ -47,7 +45,7 @@ class LocalAPIServer(mp.Process):
                 
             """
 
-            print realCommand
+            
 
 
 class GoipUDPSender(mp.Process):
@@ -235,6 +233,11 @@ if __name__ == "__main__":
     apiQueue = mp.Queue()
     apiHandle = LocalAPIServer(apiQueue,)
     apiHandle.start()
+    
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    while True:
+        sock.sendto("nope", ("127.0.0.1", 13666))
+        sleep(5)
     
     server = ss.UDPServer((HOST, PORT), GoipUDPListener)
     server.serve_forever()
