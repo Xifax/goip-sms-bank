@@ -35,5 +35,16 @@ border-color: #d0e3f0;
   @extend .text-muted;
   &:hover {
     text-decoration: none;
+
+    img {
+      -webkit-filter: opacity(50%);
+    }
   }
+
+  img {
+    width: 5%;
+    margin-bottom: 5px;
+  }
+
 }
+

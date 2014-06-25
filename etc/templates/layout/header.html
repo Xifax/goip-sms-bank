@@ -20,15 +20,22 @@
             </li>
           {% endif %}
 
+          {% if user.is_superuser %}
+            <li>
+              <a href="{% url 'admin:index' %}">Админка</a>
+            </li>
+          {% endif %}
+
           {% if user.is_authenticated %}
             <li>
-              <a href="{% url 'logout'%}">Выйти</a>
+              <a href="{% url 'logout' %}">Выйти</a>
             </li>
           {% endif %}
 
         </ul>
         <h3 class="text-muted thin-font">
-          <a class='logo' href="{% url 'landing' %}">
+          <a class="logo" href="{% url 'landing' %}">
+          <img src="{{ STATIC_URL}}images/antique.png" alt="logo">
             СМС Банк
           </a>
           {% if user.is_authenticated %}

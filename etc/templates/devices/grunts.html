@@ -17,9 +17,9 @@
     <a href="{% url 'grunt-list' grunt.id %}" class="list-group-item"
       title="Отобразить список отправленных смс">
         {% if grunt.online %}
-          <span class="badge alert-success">доступно</span>
+          <span class="badge alert-success mono-font">доступно</span>
         {% else %}
-          <span class="badge alert-danger">недоступно</span>
+          <span class="badge alert-danger mono-font">недоступно</span>
         {% endif %}
           {{ grunt.ip }}:<strong>{{ grunt.port }}</strong>
       </a>
