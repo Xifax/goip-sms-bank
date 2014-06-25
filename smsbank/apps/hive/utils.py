@@ -5,22 +5,58 @@ import string
 import re
 from __builtin__ import Exception
 import multiprocessing as mp
-import os
-import sys
+import json
+#import os
+#import sys
 from time import sleep
 
 port = 44444
 host = "0.0.0.0"
 
-#commQueue = mp.A
-class GoipUDPSender(mp.Process):
-    """
-    """
-    socket = None
+class LocalAPIServer(mp.Process):
+    host = "0.0.0.0"
+    port = 13666
     queue = None
     
     def __init__(self, queue):
-        self.socket = socket
+        mp.Process.__init__(self)
+        #self.socket = socket
+        self.queue = queue
+        
+    def run(self):
+        locaServer = ss.UDPServer((self.host, self.port), self.LocalAPIListener)
+        locaServer.serve_forever()
+        None
+        
+    class LocalAPIListener(ss.BaseRequestHandler):
+        def handle(self):
+            data = self.request[0].strip()
+            socket = self.request[1]
+            command = self.getCommand(self.request[0])
+            dummyReq = '{"id": 1, "command": "USSD", data: {"code": "*201#"}}'
+            #realCommand = json.JSONDecoder(self.request[0])
+            realCommand = json.JSONDecoder().decode(dummyReq)
+            realCommand = ""
+            """
+            id
+            command
+            data ->
+                SMS -> recipient, message
+                USSD -> code
+                RAW -> command (debug command)
+                
+            """
+
+            print realCommand
+
+
+class GoipUDPSender(mp.Process):
+    """
+    """
+    queue = None
+    
+    def __init__(self, queue):
+        mp.Process.__init__(self)
         self.queue = queue
         #self.sendResponces()
         
@@ -195,6 +231,10 @@ if __name__ == "__main__":
     #sender  = mp.Process(target=GoipUDPSender, args=(senderQueue,))
     sender = GoipUDPSender(senderQueue,)
     sender.start()
+    
+    apiQueue = mp.Queue()
+    apiHandle = LocalAPIServer(apiQueue,)
+    apiHandle.start()
     
     server = ss.UDPServer((HOST, PORT), GoipUDPListener)
     server.serve_forever()
