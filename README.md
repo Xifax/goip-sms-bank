@@ -100,7 +100,7 @@ http {
         location /static/ {
             alias /path/to/application/etc/static_collected/;
             location ~* \.(js|css|png|jpg|jpeg|gif|ico)$ {
-                expires 1y;
+                expires 30d;
                 log_not_found off;
             }
         }

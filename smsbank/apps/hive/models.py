@@ -9,6 +9,10 @@ class Device(models.Model):
     port = models.PositiveIntegerField()
     online = models.NullBooleanField(default=False, blank=True)
 
+    # Additional properties
+    imei = models.CharField(max_length=17, null=True, blank=True)
+    device_id = models.CharField(max_length=100, null=True, blank=True)
+
     class Meta:
         verbose_name = u'устройство'
         verbose_name_plural = u'устройства'
@@ -23,9 +27,11 @@ class Device(models.Model):
 
 class Sms(models.Model):
     """SMS, send or received by device"""
-    recipient = models.CharField(max_length='100')
-    message = models.CharField(max_length='10000')
-    date = models.DateField(auto_now_add=True, null=True, blank=True)
+    recipient = models.CharField(max_length=100)
+    message = models.CharField(max_length=10000)
+
+    # Set current datetime on creation
+    date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     device = models.ForeignKey(Device, null=True, blank=True)
 
     class Meta:
