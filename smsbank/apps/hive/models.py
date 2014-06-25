@@ -6,14 +6,20 @@ from django.contrib.auth.models import User
 class Device(models.Model):
     """GSM module, provided by GOIP SMS bank"""
     ip = models.GenericIPAddressField()
-    port = models.PositiveIntegerField()
-    online = models.NullBooleanField(default=False, blank=True)
+    port = models.PositiveIntegerField(verbose_name=u'порт')
+    online = models.NullBooleanField(
+        default=False,
+        blank=True,
+        verbose_name=u'онлайн'
+    )
 
     # Additional properties
     imei = models.CharField(max_length=17, null=True, blank=True)
     device_id = models.CharField(max_length=100, null=True, blank=True)
 
     class Meta:
+        unique_together = ('ip', 'port')
+
         verbose_name = u'устройство'
         verbose_name_plural = u'устройства'
 
@@ -27,12 +33,17 @@ class Device(models.Model):
 
 class Sms(models.Model):
     """SMS, send or received by device"""
-    recipient = models.CharField(max_length=100)
-    message = models.CharField(max_length=10000)
+    recipient = models.CharField(max_length=100, verbose_name=u'получатель')
+    message = models.CharField(max_length=10000, verbose_name=u'сообщение')
 
     # Set current datetime on creation
     date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    device = models.ForeignKey(Device, null=True, blank=True)
+    device = models.ForeignKey(
+        Device,
+        null=True,
+        blank=True,
+        verbose_name=u'устройство'
+    )
 
     class Meta:
         verbose_name = u'смс'
@@ -44,12 +55,18 @@ class Sms(models.Model):
 
 class DeviceList(models.Model):
     """Lists devices associated with user"""
-    user = models.ForeignKey(User, related_name='device_list')
+    user = models.ForeignKey(
+        User,
+        related_name='device_list',
+        verbose_name=u'пользователь'
+    )
+
     devices = models.ManyToManyField(
         Device,
         related_name='profiles',
         null=True,
-        blank=True
+        blank=True,
+        verbose_name=u'устройства'
     )
 
     class Meta:
