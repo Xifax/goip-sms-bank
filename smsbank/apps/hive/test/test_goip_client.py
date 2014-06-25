@@ -38,6 +38,29 @@ class ClientTestCase(TestCase):
         client = GOIPClient(self.device_id, self.ip, self.port)
         response = client.send_sms('recipient', 'test')
         self.assertIn('data', json.loads(response))
+        self.assertIn('recipient', json.loads(response)['data'])
+        self.assertEqual(
+            'recipient',
+            json.loads(response)['data']['recipient']
+        )
+
+    def test_can_ussd(self):
+        """Check if can perform ussd request"""
+        client = GOIPClient(self.device_id, self.ip, self.port)
+        response = client.send_ussd(100)
+        self.assertIn('data', json.loads(response))
+        self.assertIn('code', json.loads(response)['data'])
+        self.assertEqual(
+            100,
+            json.loads(response)['data']['code']
+        )
+
+    def test_can_issue_restart(self):
+        """Check if can reboot GOIP"""
+        client = GOIPClient(self.device_id, self.ip, self.port)
+        response = client.goip_restart()
+        self.assertIn('data', json.loads(response))
+        self.assertFalse(json.loads(response)['data'])
 
     def tearDown(self):
         self.server.shutdown()
