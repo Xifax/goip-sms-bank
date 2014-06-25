@@ -5,22 +5,56 @@ import string
 import re
 from __builtin__ import Exception
 import multiprocessing as mp
-import os
-import sys
+import json
+#import os
+#import sys
 from time import sleep
 
 port = 44444
 host = "0.0.0.0"
 
-#commQueue = mp.A
-class GoipUDPSender(mp.Process):
-    """
-    """
-    socket = None
+class LocalAPIServer(mp.Process):
+    host = "0.0.0.0"
+    port = 13666
     queue = None
     
     def __init__(self, queue):
-        self.socket = socket
+        mp.Process.__init__(self)
+        #self.socket = socket
+        self.queue = queue
+        
+    def run(self):
+        locaServer = ss.UDPServer((self.host, self.port), self.LocalAPIListener)
+        locaServer.serve_forever()
+        None
+        
+    class LocalAPIListener(ss.BaseRequestHandler):
+        def handle(self):
+            realCommand = json.loads(self.request[0])
+            self.queue.push(realCommand)
+            print "we got signal"
+            print realCommand
+
+            """
+            id
+            command
+            data ->
+                SMS -> recipient, message
+                USSD -> code
+                RAW -> command (debug command)
+                
+            """
+
+            
+
+
+class GoipUDPSender(mp.Process):
+    """
+    """
+    queue = None
+    
+    def __init__(self, queue):
+        mp.Process.__init__(self)
         self.queue = queue
         #self.sendResponces()
         
@@ -195,6 +229,15 @@ if __name__ == "__main__":
     #sender  = mp.Process(target=GoipUDPSender, args=(senderQueue,))
     sender = GoipUDPSender(senderQueue,)
     sender.start()
+    
+    apiQueue = mp.Queue()
+    apiHandle = LocalAPIServer(apiQueue,)
+    apiHandle.start()
+    
+    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    while True:
+        sock.sendto("nope", ("127.0.0.1", 13666))
+        sleep(5)
     
     server = ss.UDPServer((HOST, PORT), GoipUDPListener)
     server.serve_forever()
