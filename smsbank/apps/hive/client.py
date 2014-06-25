@@ -11,7 +11,7 @@ class GOIPClient:
 
     # Public API #
 
-    def __init__(self, ip, port, device_id):
+    def __init__(self, device_id, ip='localhost', port=13666):
         """Initialize GOIP client"""
         self.ip = ip
         self.port = port
@@ -50,14 +50,13 @@ class GOIPClient:
 
     def query(self, json):
         """Query GOIP daemon"""
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
-            sock.connect((self.ip, self.port))
-            sock.sendall(json)
+            sock.sendto(json + "\n", (self.ip, self.port))
             response = sock.recv(1024)
             return response
-            # TODO: process response
-        except socket.error:
+        except socket.error as e:
+            print e
             return None
         finally:
             sock.close()
