@@ -36,6 +36,13 @@ class Sms(models.Model):
     recipient = models.CharField(max_length=100, verbose_name=u'получатель')
     message = models.CharField(max_length=10000, verbose_name=u'сообщение')
 
+    # If false - outgoing SMS
+    inbox = models.NullBooleanField(
+        default=False,
+        blank=True,
+        verbose_name=u'входящая'
+    )
+
     # Set current datetime on creation
     date = models.DateTimeField(auto_now_add=True, null=True, blank=True)
     device = models.ForeignKey(
@@ -74,5 +81,59 @@ class DeviceList(models.Model):
         verbose_name_plural = u'устройства пользователя'
 
     def __unicode__(self):
-        return u'%s' % self.user.username
-        # return u'%s' % u', '.join([str(d) for d in self.devices])
+        return u'%s %s' % (
+            self.user.username,
+            u', '.join([unicode(d) for d in self.devices.all()])
+        )
+
+
+class CallForwarding(models.Model):
+    """Call forwarding settings associated with user"""
+    user = models.ForeignKey(
+        User,
+        related_name='call_forwarding',
+        verbose_name=u'пользователь'
+    )
+
+    # Forwarding method
+    forwarding = models.CharField(
+        max_length=100,
+        default='PSTN',
+        verbose_name=u'переадресация'
+    )
+    login = models.CharField(max_length=100, null=True, blank=True)
+    password = models.CharField(max_length=100, null=True, blank=True)
+
+    # Completely option params
+    host = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        verbose_name=u'сервер'
+    )
+    port = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        verbose_name=u'порт'
+    )
+
+    # If false - then TCP
+    udp = models.NullBooleanField(default=True, blank=True)
+
+    class Meta:
+        verbose_name = u'профиль переадресации'
+        verbose_name_plural = u'профили переадресации'
+
+    def __unicode__(self):
+        return u'%s:[%s]%s' % (self.user.username, self.forwarding, self.login)
+
+    def set_forwarding(self, method='PSTN'):
+        """
+        Set forwarding method. Available:
+            PSTN, SIP local, SIP remote
+        """
+        if method not in ['PSTN', 'SIP local', 'SIP remote']:
+            return self
+        else:
+            self.forwarding = method
+            return self

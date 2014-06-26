@@ -1,4 +1,6 @@
 # coding: utf-8
+
+# Django modules
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.http import Http404
@@ -8,9 +10,21 @@ from django.contrib.auth import(
     authenticate
 )
 
-from forms import SMSForm, CustomAuthForm, CustomRegisterForm
-from models import DeviceList, Device
-from services import sms_list, get_device_by_id
+# Project modules
+from forms import (
+    SMSForm,
+    CustomAuthForm,
+    CustomRegisterForm
+)
+from models import (
+    DeviceList,
+    Device
+)
+from services import (
+    associate_profiles,
+    sms_list,
+    get_device_by_id
+)
 
 ################
 # Landing page #
@@ -83,10 +97,8 @@ def register(request):
                 password=form.cleaned_data['password1']
             )
 
-            # And associate profile
-            profile = DeviceList()
-            profile.user = user
-            profile.save()
+            # And associate all required profiles
+            associate_profiles(user)
 
             # Login registered user
             user.backend = 'django.contrib.auth.backends.ModelBackend'
