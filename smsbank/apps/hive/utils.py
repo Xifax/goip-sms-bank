@@ -15,6 +15,7 @@ import random
 
 port = 44444
 host = "0.0.0.0"
+devPassword = "123"
 
 class LocalAPIServer(mp.Process):
     host = "0.0.0.0"
@@ -37,7 +38,7 @@ class LocalAPIServer(mp.Process):
         def handle(self):
             realCommand = json.loads(self.request[0])
             if realCommand['command'] in ['USSD', 'SMS']:
-                realCommand['seed'] = random.randrange(10000, 20000)
+                realCommand['seed'] = random.randrange(1000000, 9999999)
             
             self.queue.put(realCommand)
             print "we got signal"
@@ -56,9 +57,6 @@ class LocalAPIServer(mp.Process):
             """
         def respond(self, command):
             return "OK"
-
-            
-
 
 class GoipUDPSender(mp.Process):
     """
@@ -81,8 +79,6 @@ class GoipUDPSender(mp.Process):
                     sock.sendto(data['data'], data['host'])
             else:
                 time.sleep(1)
-                
-    
   
 class GoipUDPListener(ss.BaseRequestHandler):
     """
@@ -170,7 +166,7 @@ class GoipUDPListener(ss.BaseRequestHandler):
         '''
         Must check existence of such device id in DB and check password afterwards
         '''
-        if password == '123':
+        if password == devPassword:
             return True
         return False
 
@@ -191,6 +187,8 @@ class deviceWorker(mp.Process):
     killFlag = False
     password = None
     
+    msgActive = {}
+    
     host = None
     port = None
     
@@ -202,7 +200,13 @@ class deviceWorker(mp.Process):
         self.devid = devid
         self.queueIn = queue
         self.host = host
-        self.queueOut = outQueue 
+        self.queueOut = outQueue
+        self.state = {'new': 1,
+                      'auth': 2,
+                      'send': 3,
+                      'waiting': 4,
+                      'done': 5
+                      }
         print host
         print "mein Konstruktor: " + str(self.devid)
         #self.newRun()
@@ -237,14 +241,24 @@ class deviceWorker(mp.Process):
             if data['command'] in ['req', 'CGATT', 'CELLINFO', 'STATE', 'EXPIRY']:
                 responce['data'] = self.processServiceRequest(data)
                 self.queueOut.put(responce)
-            elif data['command'] in ['SMS', 'USSD']:
+            elif data['command'] in ['MSG', 'USSD', 'PASSWORD', 'SEND', 'WAIT', 'DONE', 'OK', 'SMSG', 'SUSSD']:
                 responce['data'] = self.processOutbound(data)
             elif data['command'] in ['RECIEVE', ]:
                 responce = self.processInboundSMS(data)
         
     def processOutbound(self, data):
+        if data['command'] == 'SMSG':
+            self.msgIdIntersectionCheck(data['seed'])
+            self.msgActive['id'] = data['seed']
         if not (data['id'] in self.msgActive):
-            None  
+            return
+        if data['command'] == 'SMSG':
+            self.msgActive['id']['state'] = None
+            
+        
+    def msgIdIntersectionCheck(self, msgId):
+        while msgId in self.msgActive:
+            msgId = random.randrange(1000000, 9999999)
         
     def processInboundSMS(self, data):
         """
