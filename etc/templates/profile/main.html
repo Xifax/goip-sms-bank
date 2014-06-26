@@ -2,9 +2,92 @@
 
 {% block content %}
 
-<div class="jumbotron">
-  This is your profile! Rejoice!
-</div>
+  <p class="lead thin-font">Добро пожаловать в профиль переадресации!</p>
+
+
+<form class="form-inline well" role="form">
+
+  <div class="row">
+
+      <div class="form-group col-sm-4">
+        <div class="input-group">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-user"></span>
+          </span>
+          <input type="text" class="form-control" placeholder="Логин" />
+        </div>
+      </div>
+
+      <div class="form-group col-sm-4">
+        <div class="input-group">
+          <span class="input-group-addon">
+              <span class="glyphicon glyphicon-tower"></span>
+          </span>
+          <input type="password" class="form-control" placeholder="Пароль" />
+        </div>
+      </div>
+
+      <div class="form-group col-sm-4">
+        <div class="input-group">
+          <span class="input-group-addon">
+              {# <span class="glyphicon glyphicon-cog"></span> #}
+              Тип
+          </span>
+          <select class="form-control">
+              <option value="pstn">PSTN</option>
+              <option value="local">SIP local</option>
+              <option value="remote">SIP remote</option>
+          </select>
+        </div>
+      </div>
+
+  </div>
+
+  <br/>
+
+  <div class="row">
+
+      <div class="form-group col-sm-6">
+        <div class="input-group">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-globe"></span>
+          </span>
+          <input type="text" class="form-control" placeholder="Сервер" />
+        </div>
+      </div>
+
+      <div class="form-group col-sm-3">
+        <div class="input-group">
+          <span class="input-group-addon">
+              <span class="glyphicon glyphicon-cog"></span>
+          </span>
+          <input type="text" class="form-control" placeholder="Порт" />
+        </div>
+      </div>
+
+      <div class="form-group col-sm-3">
+        <div class="input-group">
+          <span class="input-group-addon">
+              <span class="glyphicon glyphicon-transfer"></span>
+          </span>
+          <select class="form-control">
+              <option value="tcp">TCP</option>
+              <option value="udp">UDP</option>
+          </select>
+        </div>
+      </div>
+
+  </div>
+
+  <br/>
+
+  <div class="row">
+    <div class="form-group col-sm-12 text-center">
+      <button type="submit" class="btn btn-success">Обновить</button>
+    </div>
+  </div>
+
+</form>
 
 {% endblock %}
 
