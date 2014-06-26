@@ -9,6 +9,7 @@ import json
 #import os
 #import sys
 from time import sleep
+from string import join
 
 port = 44444
 host = "0.0.0.0"
@@ -31,9 +32,11 @@ class LocalAPIServer(mp.Process):
     class LocalAPIListener(ss.BaseRequestHandler):
         def handle(self):
             realCommand = json.loads(self.request[0])
-            self.queue.push(realCommand)
-            print "we got signal"
-            print realCommand
+            self.queue.put(realCommand)
+            #print "we got signal"
+            #print realCommand
+            socket = self.request[1]
+            socket.sendto(self.respond(realCommand), self.client_address)
 
             """
             id
@@ -44,6 +47,8 @@ class LocalAPIServer(mp.Process):
                 RAW -> command (debug command)
                 
             """
+        def respond(self, command):
+            return "OK"
 
             
 
@@ -117,13 +122,14 @@ class GoipUDPListener(ss.BaseRequestHandler):
     def parseRequest(self, data):
         reqdata = string.split(data, ";")
         command = {}
-        for comBun in reqdata:
-            if string.find(comBun, ":") != -1:
-                tmp = string.split(comBun,":")
-                if tmp[0] == 'password':    #correcting for Chinese protocol unevenness, when sometimes its 'pass' and sometimes its 'password' 
-                    tmp[0] = 'pass'
-                command[tmp[0]] = tmp[1]
-        command['command'] = self.getCommand(data)         
+        if data['command'] in ['req', 'CGATT', 'CELLINFO', 'STATE', 'EXPIRY', 'RECIEVE']:
+            for comBun in reqdata:
+                if string.find(comBun, ":") != -1:
+                    tmp = string.split(comBun,":")
+                    if tmp[0] == 'password':    #correcting for Chinese protocol unevenness, when sometimes its 'pass' and sometimes its 'password' 
+                        tmp[0] = 'pass'
+                    command[tmp[0]] = tmp[1]
+            command['command'] = self.getCommand(data)         
         return command
         
     def authDevice(self, command, password):
@@ -184,20 +190,38 @@ class deviceWorker(mp.Process):
                 print "Expire is now: " + str(self.expire)
                 
             if self.expire <= 0:
-                print "For thy Emperor of the catkind i will sacrifice myself"
+                print "For thy Emperor of the catkind I will sacrifice myself"
                 #return
                 #self.terminate()
             
     def processRequest(self):
         responce = {}
+        responce['host'] = self.host
         while not self.queueIn.empty():
             data = self.queueIn.get_nowait()
             print data
             if data['command'] in ['req', 'CGATT', 'CELLINFO', 'STATE', 'EXPIRY']:
                 responce['data'] = self.processServiceRequest(data)
-                responce['host'] = self.host
                 self.queueOut.put(responce)
-                
+            elif data['command'] in ['SMS', 'USSD']:
+                responce['data'] = self.processOutbound(data)
+            elif data['command'] in ['RECIEVE', ]:
+                responce = self.processInboundSMS(data)
+        
+    def processOutbound(self, data):
+        None
+        
+    def processInboundSMS(self, data):
+        """
+        RECEIVE:1403245796;id:1;password:123;srcnum:+79520999249;msg:MSGBODY
+        """
+        print "I've got message from {}. It reads as follows:".data['srcnum']
+        print data['msg']
+        print "Technically I can save it, but I won't"
+        responce = string.join(['RECIEVE', data['RECEIEVE'], 'OK'])
+        print responce
+        return responce
+             
 
     def processServiceRequest(self, data):
         if data['command'] == 'req':
@@ -233,11 +257,6 @@ if __name__ == "__main__":
     apiQueue = mp.Queue()
     apiHandle = LocalAPIServer(apiQueue,)
     apiHandle.start()
-    
-    sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    while True:
-        sock.sendto("nope", ("127.0.0.1", 13666))
-        sleep(5)
     
     server = ss.UDPServer((HOST, PORT), GoipUDPListener)
     server.serve_forever()
