@@ -16,6 +16,7 @@ import random
 port = 44444
 host = "0.0.0.0"
 devPassword = "123"
+defaultRandomNumber = 4
 
 class LocalAPIServer(mp.Process):
     host = "0.0.0.0"
@@ -66,7 +67,7 @@ class GoipUDPSender(mp.Process):
     def __init__(self, queue):
         mp.Process.__init__(self)
         self.queue = queue
-        #self.sendResponces()
+        #self.sendresponses()
         
     def run(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -157,7 +158,7 @@ class GoipUDPListener(ss.BaseRequestHandler):
                         tmp[0] = 'pass'
                     command[tmp[0]] = tmp[1]
         elif data['command'] in ['MSG', 'USSD', 'PASSWORD', 'SEND', 'WAIT', 'DONE', 'OK']:
-            command['id'] = data.split()[1]
+            command['seed'] = data.split()[1]
             command['data'] = data
         command['command'] = self.getCommand(data)
         return command
@@ -188,6 +189,7 @@ class deviceWorker(mp.Process):
     password = None
     
     msgActive = {}
+    msgCount = 0
     
     host = None
     port = None
@@ -201,11 +203,13 @@ class deviceWorker(mp.Process):
         self.queueIn = queue
         self.host = host
         self.queueOut = outQueue
-        self.state = {'new': 1,
-                      'auth': 2,
-                      'send': 3,
-                      'waiting': 4,
-                      'done': 5
+        self.state = {'new':        1,
+                      'auth':       2,
+                      'send':       3,
+                      'waiting':    4,
+                      'sent':       5,
+                      'done':       6,
+                      'delivered':  7,
                       }
         print host
         print "mein Konstruktor: " + str(self.devid)
@@ -233,27 +237,61 @@ class deviceWorker(mp.Process):
                 #self.terminate()
             
     def processRequest(self):
-        responce = {}
-        responce['host'] = self.host
+        response = {}
+        response['host'] = self.host
         while not self.queueIn.empty():
             data = self.queueIn.get_nowait()
             print data
             if data['command'] in ['req', 'CGATT', 'CELLINFO', 'STATE', 'EXPIRY']:
-                responce['data'] = self.processServiceRequest(data)
-                self.queueOut.put(responce)
-            elif data['command'] in ['MSG', 'USSD', 'PASSWORD', 'SEND', 'WAIT', 'DONE', 'OK', 'SMSG', 'SUSSD']:
-                responce['data'] = self.processOutbound(data)
+                response['data'] = self.processServiceRequest(data)
+                self.queueOut.put(response)
+            elif data['command'] in ['MSG', 'USSD', 'PASSWORD', 'SEND', 'WAIT', 'DONE', 'OK', 'SMSG', 'SUSSD', 'DELIVER']:
+                response['data'] = self.processOutbound(data)
             elif data['command'] in ['RECIEVE', ]:
-                responce = self.processInboundSMS(data)
+                response = self.processInboundSMS(data)
         
     def processOutbound(self, data):
         if data['command'] == 'SMSG':
+            self.msgCount += 1
+            self.msgActive[data['seed']]['locId'] = self.msgCount
             self.msgIdIntersectionCheck(data['seed'])
-            self.msgActive['id'] = data['seed']
-        if not (data['id'] in self.msgActive):
+            self.msgActive[data['seed']] = {}
+            message = self.msgActive[data['seed']]
+        
+        if not (data['id'] in self.msgActive) or data['command'] == "DELIVER":
             return
+        elif data['id'] in self.msgActive:
+            message = self.msgActive[data['seed']]
+            
         if data['command'] == 'SMSG':
-            self.msgActive['id']['state'] = None
+            message['state'] = self.state['new']
+            message['message'] = data['data']['message']
+            message['recipient'] = data['data']['recipient']
+            response = "MSG " + str(data['seed']) + " " + len(data['data']['message']) + " " + data['data']['message']
+        elif data['command'] == 'PASSWORD':
+            message['state'] = self.state['auth']
+            response = " ".join([data['command'], str(data['seed']), devPassword])
+        elif data['command'] == 'SEND':
+            message['state'] = self.state['send']
+            response = " ".join([data['command'], str(data['seed']), devPassword, message['recipient']])
+        elif data['command'] == 'WAIT':
+            message['state'] = self.state['wait']
+            #response = " ".join(["OK", str(data['seed']), devPassword, message['recipient']])
+        elif data['command'] == 'OK':
+            
+            self.msgActive['goipId'][data['data'].split()[3]] = message
+            message['state'] = self.state['sent']
+            response = " ".join(["DONE", data['seed']])
+        elif data['command'] == 'DONE':
+            message['state'] = self.state['sent']
+        elif data['command'] == 'DELIVER':
+            message = self.msgActive['goipId'][data['sms_no']]
+            message['state'] = self.state['delivered']
+            response = data['command'] + " " + str(data[data['command']]) + " OK"
+            
+            
+            
+        return response
             
         
     def msgIdIntersectionCheck(self, msgId):
@@ -267,15 +305,15 @@ class deviceWorker(mp.Process):
         print "I've got message from {}. It reads as follows:".data['srcnum']
         print data['msg']
         print "Technically I can save it, but I won't"
-        responce = string.join(['RECIEVE', data['RECEIEVE'], 'OK'])
-        print responce
-        return responce
+        response = string.join(['RECIEVE', data['RECEIEVE'], 'OK'])
+        print response
+        return response
              
 
     def processServiceRequest(self, data):
         if data['command'] == 'req':
-            responce = 'reg:' + str(data['req']) +';status:200'
-            return responce
+            response = 'reg:' + str(data['req']) +';status:200'
+            return response
         #if not regActive(commandData["id"]):
         #    return
         
@@ -292,8 +330,8 @@ class deviceWorker(mp.Process):
         else:
             raise Exception
             return
-        responce = data['command'] + " " + str(data[data['command']]) + " OK"
-        return responce
+        response = data['command'] + " " + str(data[data['command']]) + " OK"
+        return response
 
     
 if __name__ == "__main__":
