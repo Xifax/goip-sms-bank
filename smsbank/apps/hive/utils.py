@@ -8,8 +8,10 @@ import multiprocessing as mp
 import json
 #import os
 #import sys
+import time
 from time import sleep
-from string import join
+import random
+
 
 port = 44444
 host = "0.0.0.0"
@@ -18,11 +20,13 @@ class LocalAPIServer(mp.Process):
     host = "0.0.0.0"
     port = 13666
     queue = None
+    sender = None
     
-    def __init__(self, queue):
+    def __init__(self, queue, sender):
         mp.Process.__init__(self)
         #self.socket = socket
         self.queue = queue
+        self.sender = sender
         
     def run(self):
         locaServer = ss.UDPServer((self.host, self.port), self.LocalAPIListener)
@@ -32,9 +36,12 @@ class LocalAPIServer(mp.Process):
     class LocalAPIListener(ss.BaseRequestHandler):
         def handle(self):
             realCommand = json.loads(self.request[0])
+            if realCommand['command'] in ['USSD', 'SMS']:
+                realCommand['seed'] = random.randrange(10000, 20000)
+            
             self.queue.put(realCommand)
-            #print "we got signal"
-            #print realCommand
+            print "we got signal"
+            print realCommand
             socket = self.request[1]
             socket.sendto(self.respond(realCommand), self.client_address)
 
@@ -73,7 +80,7 @@ class GoipUDPSender(mp.Process):
                     print data['data']
                     sock.sendto(data['data'], data['host'])
             else:
-                sleep(1)
+                time.sleep(1)
                 
     
   
@@ -89,26 +96,50 @@ class GoipUDPListener(ss.BaseRequestHandler):
     sender = None
     
     def handle(self):
-        data = self.request[0].strip()
+        #data = self.request[0].strip()
         socket = self.request[1]
-        command = self.getCommand(self.request[0])
+        #command = self.getCommand(self.request[0])
         query = self.parseRequest(self.request[0])
         print self.devPool
-        if not self.deviceActive(query['id']):
-            if self.authDevice(query['id'], query['pass']):
-                queue = mp.Queue()
-                #device = mp.Process(target=deviceWorker, args=(query['id'], self.client_address, queue, senderQueue))
-                device = deviceWorker(query['id'], self.client_address, queue, senderQueue)
-                device.start()
-                #device._target.newRun()
-                self.devPool[query['id']] = {}
-                self.devPool[query['id']]['device'] = device
-                self.devPool[query['id']]['queue'] = queue
-        device = self.devPool[query['id']]['device']
+        self.queryDevice(query['id'], query['pass'])
+        #device = self.devPool[query['id']]['device']
+        
+        
+        # BAD Practice BUT, now we init event
+        
+        #if not apiQueue.empty():
+        while not apiQueue.empty():
+            outbound = apiQueue.get()
+            if self.deviceActive(outbound['id']):
+                if outbound['command'] == 'MSG':
+                    outbound['command'] = 'SMSG'
+                if outbound['command'] == 'USSD':
+                    outbound['command'] = 'SUSSD'
+                outQueue = self.outbound[query['id']]['queue']
+                outQueue.put(outbound)
+            #self.queryDevice(devId, passw, 1)
+            None
+        
+        
         queue = self.devPool[query['id']]['queue']
         queue.put_nowait(query)
         print "queue " + str(queue.qsize())
         print "Process count: " + str(len(self.devPool))
+    
+    def queryDevice(self, devId, passw, auth=0):
+        authState = True
+        if auth == 1:
+            authState = self.authDevice()
+        if (not self.deviceActive(devId) and authState):
+            queue = mp.Queue()
+            #device = mp.Process(target=deviceWorker, args=(devId, self.client_address, queue, senderQueue))
+            device = deviceWorker(devId, self.client_address, queue, senderQueue)
+            device.start()
+            #device._target.newRun()
+            self.devPool[devId] = {}
+            self.devPool[devId]['device'] = device
+            self.devPool[devId]['queue'] = queue
+        return device
     
     def deviceActive(self, devId):
         if devId in self.devPool:
@@ -129,7 +160,10 @@ class GoipUDPListener(ss.BaseRequestHandler):
                     if tmp[0] == 'password':    #correcting for Chinese protocol unevenness, when sometimes its 'pass' and sometimes its 'password' 
                         tmp[0] = 'pass'
                     command[tmp[0]] = tmp[1]
-            command['command'] = self.getCommand(data)         
+        elif data['command'] in ['MSG', 'USSD', 'PASSWORD', 'SEND', 'WAIT', 'DONE', 'OK']:
+            command['id'] = data.split()[1]
+            command['data'] = data
+        command['command'] = self.getCommand(data)
         return command
         
     def authDevice(self, command, password):
@@ -189,8 +223,8 @@ class deviceWorker(mp.Process):
                 self.expire -= 1
                 print "Expire is now: " + str(self.expire)
                 
-            if self.expire <= 0:
-                print "For thy Emperor of the catkind I will sacrifice myself"
+            #if self.expire <= 0:
+            #    print "For thy Emperor of the catkind I will sacrifice myself"
                 #return
                 #self.terminate()
             
@@ -209,7 +243,8 @@ class deviceWorker(mp.Process):
                 responce = self.processInboundSMS(data)
         
     def processOutbound(self, data):
-        None
+        if not (data['id'] in self.msgActive):
+            None  
         
     def processInboundSMS(self, data):
         """
@@ -255,7 +290,7 @@ if __name__ == "__main__":
     sender.start()
     
     apiQueue = mp.Queue()
-    apiHandle = LocalAPIServer(apiQueue,)
+    apiHandle = LocalAPIServer(apiQueue, senderQueue)
     apiHandle.start()
     
     server = ss.UDPServer((HOST, PORT), GoipUDPListener)
