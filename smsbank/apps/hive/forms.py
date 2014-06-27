@@ -88,7 +88,7 @@ class CallForwardingForm(forms.ModelForm):
         (True, 'UDP'),
         (False, 'TCP')
     )
-    protocol = forms.ChoiceField(
+    udp = forms.ChoiceField(
         widget=forms.Select(attrs={'class': 'form-control'}),
         choices=PROTOCOLS,
         required=False
