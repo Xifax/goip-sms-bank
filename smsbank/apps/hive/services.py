@@ -4,8 +4,14 @@
 
 from smsbank.apps.hive.models import (
     Device,
-    Sms
+    Sms,
+    DeviceList,
+    CallForwarding
 )
+
+########################
+# Working with Devices #
+########################
 
 
 def device_exists(ip, port):
@@ -47,3 +53,22 @@ def get_device_by_id(device_id):
         return Device.objects.get(id=device_id)
     except Device.DoesNotExist:
         return None
+
+
+#########################
+# Working with profiles #
+#########################
+
+def associate_profiles(user):
+    """Create default profiles for new user"""
+    # Associate device list
+    profile = DeviceList()
+    profile.user = user
+    profile.save()
+
+    # Also add forwarding profile
+    forwarding = CallForwarding()
+    forwarding.user = user
+    forwarding.save()
+
+    return user
