@@ -87,7 +87,7 @@ class GoipUDPListener(ss.BaseRequestHandler):
     when sending data back via sendto().
     """
     devPool = {}
-    senderQueue = mp.Queue
+    senderQueue = mp.Queue()
     sender = None
     seedDic = mp.Manager().dic()
 
@@ -109,9 +109,9 @@ class GoipUDPListener(ss.BaseRequestHandler):
         #print self.devPool
         self.queryDevice(query['id'], query['pass'])
         #device = self.devPool[query['id']]['device']
-        if not senderQueue.empty():
-            while not senderQueue.empty():
-                data = senderQueue.get()
+        if not self.senderQueue.empty():
+            while not self.senderQueue.empty():
+                data = self.senderQueue.get()
                 print data['host']
                 print data['data']
                 sock.sendto(data['data'], data['host'])
