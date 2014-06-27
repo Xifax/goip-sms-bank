@@ -65,6 +65,6 @@ class GOIPClient:
     def prepare(self, request, data=None):
         return json.dumps({
             'id': self.device_id,
-            'command': request,
+            'command': request.upper(),
             'data': data
         })

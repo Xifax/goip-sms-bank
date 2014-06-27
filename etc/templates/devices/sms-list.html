@@ -33,7 +33,9 @@
     <thead>
           <tr>
             <th>#</th>
-            {% if not inbox %}
+            {% if inbox %}
+            <th>Отправитель</th>
+            {% else %}
             <th>Адресат</th>
             {% endif %}
             <th>Сообщение</th>
@@ -43,9 +45,7 @@
     {% for sms in sms_list %}
     <tr>
       <td>{{ forloop.counter }}</td>
-      {% if not inbox %}
       <td>{{ sms.recipient }} </td>
-      {% endif %}
       <td>{{ sms.message }} </td>
       <td>{{ sms.date }} </td>
     </tr>

@@ -10,7 +10,6 @@ import random
 
 from smsbank.apps.hive.services import (
     initialize_device,
-    get_device,
     new_sms,
 )
 
@@ -289,11 +288,15 @@ class deviceWorker(mp.Process):
                 response['data'] = self.processInboundSMS(data)
                 self.queueOut.put(response)
             else:
+                print 'RAISING EXCEPTION'
+                print data
                 raise Exception
 
             print response
 
     def processOutbound(self, data):
+        print 'PROCESSING OUTBOUND'
+        print data
         if data['command'] == 'SMSG':
             self.msgCount += 1
             self.msgActive[data['seed']] = {}
@@ -321,17 +324,19 @@ class deviceWorker(mp.Process):
             response = " ".join([data['command'], str(data['seed']), devPassword])
         elif data['command'] == 'SEND':
             message['state'] = self.state['send']
-            response = " ".join([data['command'], str(data['seed']), message['locId'], message['recipient']])
+            response = " ".join([data['command'], str(data['seed']), str(message['locId']), message['recipient']])
         elif data['command'] == 'WAIT':
             message['state'] = self.state['waiting']
             response = "WAIT OK"
             #response = " ".join(["OK", str(data['seed']), devPassword, message['recipient']])
         elif data['command'] == 'OK':
+            print 'OKAAAAAAAAAAAY'
             goipId = data['data'].split()[3]
             self.msgActive['goipId'][goipId] = message
             message['state'] = self.state['sent']
             response = " ".join(["DONE", str(data['seed'])])
         elif data['command'] == 'DONE':
+            print '>>> MESSAGE SENT!'
             message['state'] = self.state['sent']
             del self.msgSeeds[data['seed']]
 
@@ -340,7 +345,7 @@ class deviceWorker(mp.Process):
                 new_sms(
                     message['recipient'],
                     message['message'],
-                    True,
+                    False,
                     self.devid
                 )
             except Exception as e:
@@ -364,6 +369,7 @@ class deviceWorker(mp.Process):
         """
         RECEIVE:1403245796;id:1;password:123;srcnum:+79520999249;msg:MSGBODY
         """
+        # TODO: log this!
         print data
         print "I've got message from {}. It reads as follows:".format(data['srcnum'])
         print data['msg']
@@ -376,7 +382,7 @@ class deviceWorker(mp.Process):
             new_sms(
                 data['srcnum'],
                 data['msg'],
-                False,
+                True,
                 self.devid
             )
         except Exception as e:
