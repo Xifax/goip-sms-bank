@@ -3,11 +3,11 @@ from django.core.management.base import BaseCommand
 
 from optparse import make_option
 import SocketServer as ss
-import multiprocessing as mp
 
 from smsbank.apps.hive.utils import (
     LocalAPIServer,
-    GoipUDPListener
+    GoipUDPListener,
+    apiQueue  # superglobal queue
 )
 
 
@@ -37,13 +37,8 @@ class Command(BaseCommand):
         Launch GOIP daemon.
         """
         # Launch local API handler
-        apiQueue = mp.Queue()
         apiHandle = LocalAPIServer(apiQueue,)
         apiHandle.start()
-
-        # Initialize shared dictionary
-        manager = mp.Manager()
-        seedDic = manager.dict()
 
         # Launch GOIP server
         server = ss.UDPServer(

@@ -8,6 +8,7 @@ import json
 from time import sleep
 import random
 
+# Initialize local constants
 port = 44444
 host = "0.0.0.0"
 devPassword = "123"
@@ -89,7 +90,7 @@ class GoipUDPListener(ss.BaseRequestHandler):
     devPool = {}
     senderQueue = mp.Queue()
     sender = None
-    seedDic = mp.Manager().dic()
+    seedDic = mp.Manager().dict()
 
     def handle(self):
         #data = self.request[0].strip()
@@ -373,9 +374,13 @@ class deviceWorker(mp.Process):
         return response
 
 
-    '''
+# Initialize superglobals
+apiQueue = mp.Queue()
+
+
 if __name__ == "__main__":
     pass
+    '''
     HOST, PORT = "0.0.0.0", 44444
     senderQueue = mp.Queue()
     #sender  = mp.Process(target=GoipUDPSender, args=(senderQueue,))
