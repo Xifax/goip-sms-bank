@@ -25,9 +25,10 @@ from models import (
 from services import (
     associate_profiles,
     new_call_forwarding_profile,
-    sms_list,
+    list_sms,
     get_device_by_id
 )
+from client import GOIPClient
 
 ################
 # Landing page #
@@ -151,12 +152,12 @@ def grunt_list(request, grunt):
     if not device:
         raise Http404
 
-    sms_sent = sms_list(device)
+    outbound_sms = list_sms(device)
 
     return render(
         request,
         'devices/grunt.html',
-        {'grunt': device, 'sms_sent': sms_sent}
+        {'grunt': device, 'sms_sent': outbound_sms}
     )
 
 
@@ -172,7 +173,17 @@ def grunt_send(request, grunt):
     if request.method == 'POST':
         form = SMSForm(data=request.POST)
         if form.is_valid():
-            sms_sent = True
+            # Get devid as specified in GOIP
+            device = get_device_by_id(grunt)
+            # Send SMS
+            if device:
+                client = GOIPClient(device.device_id)
+                sms_sent = client.send_sms(
+                    form.cleaned_data['phone'],
+                    form.cleaned_data['message']
+                )
+            else:
+                error_message = u'Не удалось получить GOIP id устройства'
         else:
             error_message = u'Указаны неверные данные'
     else:

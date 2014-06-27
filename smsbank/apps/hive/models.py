@@ -15,7 +15,12 @@ class Device(models.Model):
 
     # Additional properties
     imei = models.CharField(max_length=17, null=True, blank=True)
-    device_id = models.CharField(max_length=100, null=True, blank=True)
+    device_id = models.CharField(
+        max_length=100,
+        unique=True,
+        null=True,
+        blank=True
+    )
 
     class Meta:
         unique_together = ('ip', 'port')

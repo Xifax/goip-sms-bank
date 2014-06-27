@@ -32,27 +32,56 @@ def get_or_create_device(ip, port, status=True):
     return device
 
 
-def new_sms(recipient, message, device=None):
-    """Create new SMS."""
-    sms = Sms(recipient=recipient, message=message)
-    if device:
-        sms.device = device
-    sms.save()
-
-    return sms
-
-
-def sms_list(device):
-    """Get SMS sent from the device"""
-    return Sms.objects.filter(device=device)
-
-
 def get_device_by_id(device_id):
     """Get device by id"""
     try:
         return Device.objects.get(id=device_id)
     except Device.DoesNotExist:
         return None
+
+
+def list_sms(device, inbox=False):
+    """Get SMS sent from the device"""
+    return Sms.objects.filter(device=device, inbox=inbox)
+
+###########################
+# Methods for GOIP Daemon #
+###########################
+
+
+def get_device(device_id):
+    """Get device by devid, as provided by GOIP daemon."""
+    try:
+        return Device.objects.get(device_id=device_id)
+    except Device.DoesNotExist:
+        return None
+
+
+def initialize_device(device_id, ip, port, online=True):
+    """Get or create device using  devid, as provided by GOIP daemon."""
+    device = get_device(device_id)
+    if not device:
+        device = Device(
+            ip=ip,
+            port=port,
+            device_id=device_id,
+            online=online
+        )
+        device.save()
+
+    return device
+
+
+def new_sms(recipient, message, inbox=False, device_id=None):
+    """Create new SMS."""
+    sms = Sms(recipient=recipient, message=message, inbox=inbox)
+    if device_id:
+            device = get_device(device_id)
+            if device:
+                sms.device = device
+
+    sms.save()
+    return sms
 
 
 #########################

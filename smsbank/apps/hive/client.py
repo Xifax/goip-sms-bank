@@ -55,8 +55,7 @@ class GOIPClient:
             sock.sendto(json + "\n", (self.ip, self.port))
             response = sock.recv(1024)
             return response
-        except socket.error as e:
-            print e
+        except socket.error:
             return None
         finally:
             sock.close()

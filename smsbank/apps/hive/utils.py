@@ -8,6 +8,12 @@ import json
 from time import sleep
 import random
 
+from smsbank.apps.hive.services import (
+    initialize_device,
+    get_device,
+    new_sms,
+)
+
 # Initialize local constants
 port = 44444
 host = "0.0.0.0"
@@ -141,10 +147,9 @@ class GoipUDPListener(ss.BaseRequestHandler):
         print "Process count: " + str(len(self.devPool))
 
     def queryDevice(self, devId, passw, auth=0):
-        authState = True
-        # TODO: get or create device via DB
-        # if auth == 1:
-        #     authState = self.authDevice()
+        # authState = True
+        authState = self.authDevice(devId, passw, self.client_address)
+
         if (not self.deviceActive(devId) and authState):
             queue = mp.Queue()
             #device = mp.Process(target=deviceWorker, args=(devId, self.client_address, queue, senderQueue))
@@ -162,6 +167,7 @@ class GoipUDPListener(ss.BaseRequestHandler):
         return False
 
     def getCommand(self, data):
+        # NB: may blow up when processing dubious data
         newdata = re.search('^([a-zA-Z]+)', data)
         return newdata.group(0)
 
@@ -183,13 +189,19 @@ class GoipUDPListener(ss.BaseRequestHandler):
 
         return command
 
-    def authDevice(self, command, password):
+    def authDevice(self, devid, password, host):
         '''
         Must check existence of such device id in DB and check password afterwards
         '''
-        # TODO: w
         if password == devPassword:
+            try:
+                initialize_device(devid, host[0], host[1])
+            except Exception as e:
+                print 'Database exception: %s' % e
+                return False
+
             return True
+
         return False
 
 class deviceWorker(mp.Process):
@@ -320,9 +332,20 @@ class deviceWorker(mp.Process):
             message['state'] = self.state['sent']
             response = " ".join(["DONE", str(data['seed'])])
         elif data['command'] == 'DONE':
-            # TODO: save outbound sms to database
             message['state'] = self.state['sent']
             del self.msgSeeds[data['seed']]
+
+            # Save outbound sms to database
+            try:
+                new_sms(
+                    message['recipient'],
+                    message['message'],
+                    True,
+                    self.devid
+                )
+            except Exception as e:
+                print 'Database exception: %s' % e
+
         elif data['command'] == 'DELIVER':
             message = self.msgActive['goipId'][data['sms_no']]
             message['state'] = self.state['delivered']
@@ -345,9 +368,20 @@ class deviceWorker(mp.Process):
         print "I've got message from {}. It reads as follows:".format(data['srcnum'])
         print data['msg']
         print "Technically I can save it, but I won't"
-        # TODO: save SMS to database
         response = " ".join(['RECEIVE', data['RECEIVE'], 'OK'])
         print response
+
+        # Save inbound sms to database
+        try:
+            new_sms(
+                data['srcnum'],
+                data['msg'],
+                False,
+                self.devid
+            )
+        except Exception as e:
+            print 'Database exception: %s' % e
+
         return response
 
 
