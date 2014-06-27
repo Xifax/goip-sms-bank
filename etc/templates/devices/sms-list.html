@@ -13,15 +13,18 @@
 
   <!-- Table header and additional info -->
   <div class="panel-heading">
-    СМС отправленные с устройства <strong>{{ grunt.ip }}:{{ grunt.port}}</strong>
+    {% if inbox %}СМС полученные устройством
+    {% else %}СМС отправленные с устройства
+    {% endif %}
+    <strong>{{ grunt.ip }}:{{ grunt.port}}</strong>
     <!--a href="{% url 'grunts' %}" class="btn btn-xs btn-success pull-right" role="button">
       К списку устройств
     </a-->
   </div>
   <div class="panel-body">
-    <p>Всего СМС: <strong>{{sms_sent|length}}</strong></p>
-    {% if sms_sent|length > 0 %}
-    <p>Последняя СМС: <strong>{{sms_sent.0.date}}</strong></p>
+    <p>Всего СМС: <strong>{{sms_list|length}}</strong></p>
+    {% if sms_list|length > 0 %}
+    <p>Последняя СМС: <strong>{{sms_list.0.date}}</strong></p>
     {% endif %}
   </div>
 
@@ -30,24 +33,30 @@
     <thead>
           <tr>
             <th>#</th>
+            {% if not inbox %}
             <th>Адресат</th>
+            {% endif %}
             <th>Сообщение</th>
             <th>Дата</th>
           </tr>
         </thead>
-    {% for sms in sms_sent %}
+    {% for sms in sms_list %}
     <tr>
       <td>{{ forloop.counter }}</td>
+      {% if not inbox %}
       <td>{{ sms.recipient }} </td>
+      {% endif %}
       <td>{{ sms.message }} </td>
       <td>{{ sms.date }} </td>
     </tr>
     {% endfor %}
 
-    {% if not sms_sent %}
+    {% if not sms_list %}
     <tr>
       <td colspan="4">
-        Нет отправленных СМС!
+        {% if inbox %}Нет полученных СМС!
+        {% else %}Нет отправленных СМС!
+        {% endif %}
       </td>
     </tr>
     {% endif %}

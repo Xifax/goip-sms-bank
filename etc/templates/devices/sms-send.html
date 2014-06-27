@@ -4,8 +4,15 @@
 
 <!-- Sub-navigation -->
 <ul class="nav nav-tabs nav-justified">
-  <li><a href="{% url 'grunt-list' grunt %}">Список СМС</a></li>
-  <li class="active"><a href="{% url 'grunt-send' grunt %}">Отправить СМС</a></li>
+  <li><a href="{% url 'grunt-list' grunt %}">
+      Отправленные СМС
+  </a></li>
+  <li><a href="{% url 'grunt-list-inbox' grunt %}">
+      Полученные СМС
+  </a></li>
+  <li class="active"><a href="{% url 'grunt-send' grunt %}">
+      Отправить СМС
+  </a></li>
 </ul>
 
 <!-- Additional info -->

@@ -142,7 +142,7 @@ def grunts(request):
     )
 
 
-def grunt_list(request, grunt):
+def grunt_list(request, grunt, inbox):
     """Display device sms list and controls"""
 
     if not request.user.is_authenticated():
@@ -152,12 +152,13 @@ def grunt_list(request, grunt):
     if not device:
         raise Http404
 
-    outbound_sms = list_sms(device)
+    # Get sms list
+    sms_list = list_sms(device, inbox)
 
     return render(
         request,
         'devices/grunt.html',
-        {'grunt': device, 'sms_sent': outbound_sms}
+        {'grunt': device, 'sms_list': sms_list, 'inbox': inbox}
     )
 
 

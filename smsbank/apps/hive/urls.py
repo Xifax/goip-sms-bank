@@ -12,7 +12,11 @@ urlpatterns = patterns(
     url(r'^grunts/', views.grunts, name='grunts'),
     url(
         r'^grunt/list/(?P<grunt>[0-9]+)/',
-        views.grunt_list, name='grunt-list'
+        views.grunt_list, {'inbox': False}, name='grunt-list'
+        ),
+    url(
+        r'^grunt/list/inbox/(?P<grunt>[0-9]+)/',
+        views.grunt_list, {'inbox': True}, name='grunt-list-inbox'
         ),
     url(
         r'^grunt/send/(?P<grunt>[0-9]+)/',
