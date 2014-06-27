@@ -16,6 +16,14 @@ class SMSForm(forms.Form):
         widget=forms.Textarea(attrs={'class': 'form-control'})
     )
 
+    def clean_phone(self):
+        """Replace 8 with +7 if required"""
+        phone = self.cleaned_data['phone']
+        if phone.startswith('8') and len(phone) > 7:
+            return phone.replace('8', '+7', 1)
+
+        return phone
+
 
 class CustomAuthForm(AuthenticationForm):
     """Custom login form"""
