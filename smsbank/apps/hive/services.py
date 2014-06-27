@@ -67,8 +67,15 @@ def associate_profiles(user):
     profile.save()
 
     # Also add forwarding profile
+    new_call_forwarding_profile(user)
+
+    return user
+
+
+def new_call_forwarding_profile(user):
+    """Associate new call forwarding profile with user"""
     forwarding = CallForwarding()
     forwarding.user = user
     forwarding.save()
 
-    return user
+    return forwarding

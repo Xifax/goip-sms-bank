@@ -98,7 +98,7 @@ class CallForwarding(models.Model):
     # Forwarding method
     forwarding = models.CharField(
         max_length=100,
-        default='PSTN',
+        default='pstn',
         verbose_name=u'переадресация'
     )
     login = models.CharField(max_length=100, null=True, blank=True)
@@ -127,12 +127,12 @@ class CallForwarding(models.Model):
     def __unicode__(self):
         return u'%s:[%s]%s' % (self.user.username, self.forwarding, self.login)
 
-    def set_forwarding(self, method='PSTN'):
+    def set_forwarding(self, method='pstn'):
         """
         Set forwarding method. Available:
             PSTN, SIP local, SIP remote
         """
-        if method not in ['PSTN', 'SIP local', 'SIP remote']:
+        if method not in ['pstn', 'local', 'remote']:
             return self
         else:
             self.forwarding = method

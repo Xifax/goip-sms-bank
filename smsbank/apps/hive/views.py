@@ -14,14 +14,17 @@ from django.contrib.auth import(
 from forms import (
     SMSForm,
     CustomAuthForm,
-    CustomRegisterForm
+    CustomRegisterForm,
+    CallForwardingForm
 )
 from models import (
     DeviceList,
-    Device
+    Device,
+    CallForwarding
 )
 from services import (
     associate_profiles,
+    new_call_forwarding_profile,
     sms_list,
     get_device_by_id
 )
@@ -199,7 +202,30 @@ def profile(request):
     if not request.user.is_authenticated():
         return redirect('login')
 
-    return render(request, 'profile/main.html')
+    profile_updated = False
+    error_message = False
+
+    # Get or create profile
+    try:
+        profile = request.user.call_forwarding.get()
+    except CallForwarding.DoesNotExist:
+        profile = new_call_forwarding_profile(request.user)
+
+    if request.method == 'POST':
+        form = CallForwardingForm(data=request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            profile_updated = True
+        else:
+            error_message = u'Не все поля заполнены как надо!'
+    else:
+        form = CallForwardingForm(instance=profile)
+
+    return render(request, 'profile/main.html', {
+        'form': form,
+        'profile_updated': profile_updated,
+        'error_message': error_message
+    })
 
 ##############
 # Additional #

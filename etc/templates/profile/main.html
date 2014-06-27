@@ -2,28 +2,40 @@
 
 {% block content %}
 
-  <p class="lead thin-font">Добро пожаловать в профиль переадресации!</p>
+<p class="lead thin-font">Добро пожаловать в профиль переадресации!</p>
 
+{% if profile_updated %}
+<div class="alert alert-success">Профиль обновлён!</div>
+{% endif %}
 
-<form class="form-inline well" role="form">
+{% if error_message %}
+<p class="alert alert-danger"><strong>{{ error_message }}</strong></p>
+{% endif %}
+
+<form class="form-inline well" role="form" method="post"
+  action="{% url 'profile' %}">
+  {% csrf_token %}
+  {{ form.non_field_errors}}
 
   <div class="row">
 
-      <div class="form-group col-sm-4">
+    <div class="form-group col-sm-4
+      {% if form.login.errors %} has-error {% endif %}">
         <div class="input-group">
           <span class="input-group-addon addon">
             <span class="glyphicon glyphicon-user"></span>
           </span>
-          <input type="text" class="form-control" placeholder="Логин" />
+          {{ form.login }}
         </div>
       </div>
 
-      <div class="form-group col-sm-4">
+      <div class="form-group col-sm-4
+        {% if form.password.errors %} has-error {% endif %}">
         <div class="input-group">
+          {{ form.password }}
           <span class="input-group-addon addon">
               <span class="glyphicon glyphicon-tower"></span>
           </span>
-          <input type="password" class="form-control" placeholder="Пароль" />
         </div>
       </div>
 
@@ -33,11 +45,7 @@
               {# <span class="glyphicon glyphicon-cog"></span> #}
               Тип
           </span>
-          <select class="form-control">
-              <option value="pstn">PSTN</option>
-              <option value="local">SIP local</option>
-              <option value="remote">SIP remote</option>
-          </select>
+          {{ form.forwarding }}
         </div>
       </div>
 
@@ -52,13 +60,14 @@
           <span class="input-group-addon addon">
             <span class="glyphicon glyphicon-globe"></span>
           </span>
-          <input type="text" class="form-control" placeholder="Сервер" />
+          {{ form.host }}
         </div>
       </div>
 
-      <div class="form-group col-sm-4">
+      <div class="form-group col-sm-4
+        {% if form.port.errors %} has-error {% endif %}">
         <div class="input-group">
-          <input type="text" class="form-control" placeholder="Порт" />
+          {{ form.port }}
           <span class="input-group-addon addon">
             <span class="glyphicon glyphicon-cog"></span>
           </span>
@@ -70,10 +79,7 @@
           <span class="input-group-addon addon">
               <span class="glyphicon glyphicon-transfer"></span>
           </span>
-          <select class="form-control">
-              <option value="tcp">TCP</option>
-              <option value="udp">UDP</option>
-          </select>
+          {{ form.protocol }}
         </div>
       </div>
 
