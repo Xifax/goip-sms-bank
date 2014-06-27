@@ -89,6 +89,7 @@ class GoipUDPListener(ss.BaseRequestHandler):
     devPool = {}
     senderQueue = mp.Queue
     sender = None
+    seedDic = mp.Manager().dic()
 
     def handle(self):
         #data = self.request[0].strip()
@@ -102,7 +103,7 @@ class GoipUDPListener(ss.BaseRequestHandler):
         if query['command'] == 'RECEIVE':
             print self.request[0]
         if 'id' not in query:
-            query['id'] = seedDic[int(self.request[0].split()[1])]
+            query['id'] = self.seedDic[int(self.request[0].split()[1])]
             query['pass'] = devPassword                         #MUST CHECK source and compare it with actual device data
         print query
         #print self.devPool
@@ -146,7 +147,7 @@ class GoipUDPListener(ss.BaseRequestHandler):
         if (not self.deviceActive(devId) and authState):
             queue = mp.Queue()
             #device = mp.Process(target=deviceWorker, args=(devId, self.client_address, queue, senderQueue))
-            device = deviceWorker(devId, self.client_address, queue, senderQueue, seedDic)
+            device = deviceWorker(devId, self.client_address, queue, self.senderQueue, self.seedDic)
             device.start()
             #device._target.newRun()
             self.devPool[devId] = {}
